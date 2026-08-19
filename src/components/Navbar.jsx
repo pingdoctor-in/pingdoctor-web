@@ -42,19 +42,13 @@ export default function Navbar({
             {/* Logo */}
             <div 
               onClick={() => setActiveTab('HOME')} 
-              className="flex items-center space-x-2 cursor-pointer group"
+              className="flex items-center space-x-3 cursor-pointer group py-1"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-netflix-cyan to-netflix-teal flex items-center justify-center shadow-cyan-glow group-hover:scale-105 transition-transform">
-                <Stethoscope className="w-6 h-6 text-black stroke-[2.5]" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-white flex items-center gap-1">
-                  Ping<span className="text-netflix-cyan">Doctor</span>
-                </span>
-                <span className="text-[10px] tracking-wider text-gray-400 -mt-1 font-semibold uppercase">
-                  Netflix for Health
-                </span>
-              </div>
+              <img
+                src={`${import.meta.env.BASE_URL}logo.png`}
+                alt="PingDoctor Logo"
+                className="h-10 sm:h-12 w-auto object-contain rounded-xl shadow-cyan-glow group-hover:scale-105 transition-transform"
+              />
             </div>
 
             {/* Desktop Navigation Links */}

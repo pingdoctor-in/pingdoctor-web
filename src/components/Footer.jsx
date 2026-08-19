@@ -8,11 +8,12 @@ export default function Footer() {
         
         {/* Top Branding & Emergency Callout */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-white/10">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-netflix-cyan flex items-center justify-center">
-              <Stethoscope className="w-5 h-5 text-black" />
-            </div>
-            <span className="text-xl font-extrabold text-white">Ping<span className="text-netflix-cyan">Doctor</span></span>
+          <div className="flex items-center space-x-3">
+            <img
+              src={`${import.meta.env.BASE_URL}logo.png`}
+              alt="PingDoctor Logo"
+              className="h-10 w-auto object-contain rounded-lg"
+            />
           </div>
 
           <div className="flex items-center space-x-2 bg-[#1f1f1f] px-4 py-2 rounded-full border border-white/10 text-xs">
