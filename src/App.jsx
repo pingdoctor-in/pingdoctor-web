@@ -4,6 +4,7 @@ import HeroBanner from './components/HeroBanner';
 import PosterRow from './components/PosterRow';
 import DoctorDetailModal from './components/DoctorDetailModal';
 import MyAppointmentsModal from './components/MyAppointmentsModal';
+import DoctorProfilePage from './components/DoctorProfilePage';
 import Footer from './components/Footer';
 import { 
   FEATURED_CONTENT, 
@@ -18,6 +19,9 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('All Departments');
   
+  // Selected doctor for dedicated profile page view vs quick modal
+  const [viewingProfileDoctor, setViewingProfileDoctor] = useState(null);
+
   // Modal states
   const [activeDoctorModal, setActiveDoctorModal] = useState(null);
   const [isAppointmentsOpen, setIsAppointmentsOpen] = useState(false);
@@ -28,13 +32,13 @@ export default function App() {
       bookingId: 'PING-849201',
       doctorName: 'Dr. Kaushik Reddy',
       specialty: 'Cardiologist',
-      hospital: 'Hyderguda Cardiology Care',
-      consultType: 'Online Video Consultation',
-      date: 'Today (Aug 19)',
-      timeSlot: '05:00 PM',
+      hospital: 'Apollo Hospitals - Jubilee Hills',
+      consultType: 'In-clinic Visit',
+      date: 'Today (Thu 17)',
+      timeSlot: '4:30 PM',
       patientName: 'John Doe',
       patientPhone: '+91 98765 43210',
-      fee: 700,
+      fee: 800,
     }
   ]);
 
@@ -66,13 +70,21 @@ export default function App() {
     setBookedAppointments((prev) => prev.filter((item) => item.bookingId !== bookingId));
   };
 
+  // Determine active view: If activeTab === 'DOCTORS' or viewingProfileDoctor is set, show Doctor Profile Page!
+  const currentProfileDoctor = viewingProfileDoctor || (activeTab === 'DOCTORS' ? FEATURED_CONTENT : null);
+
   return (
     <div className="min-h-screen bg-[#141414] text-white flex flex-col selection:bg-netflix-cyan selection:text-black">
       
       {/* Sticky Top Navbar */}
       <Navbar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={(tab) => {
+          setActiveTab(tab);
+          if (tab !== 'DOCTORS') {
+            setViewingProfileDoctor(null);
+          }
+        }}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         selectedDepartment={selectedDepartment}
@@ -82,102 +94,104 @@ export default function App() {
         onOpenAppointments={() => setIsAppointmentsOpen(true)}
       />
 
-      {/* Main Container */}
-      <main className="flex-1">
-        
-        {/* Featured Hero Banner */}
-        <HeroBanner
-          featured={FEATURED_CONTENT}
-          onSelectDoctor={(doc) => setActiveDoctorModal(doc)}
+      {/* VIEW 1: DEDICATED DOCTOR PROFILE PAGE (Matches Reference Screenshot) */}
+      {currentProfileDoctor ? (
+        <DoctorProfilePage
+          doctor={currentProfileDoctor}
           onBookDoctor={(doc) => setActiveDoctorModal(doc)}
+          onBackToStream={() => {
+            setViewingProfileDoctor(null);
+            setActiveTab('HOME');
+          }}
         />
+      ) : (
+        /* VIEW 2: NETFLIX STREAMING HOMEPAGE */
+        <main className="flex-1">
+          
+          {/* Featured Hero Banner */}
+          <HeroBanner
+            featured={FEATURED_CONTENT}
+            onSelectDoctor={(doc) => setViewingProfileDoctor(doc)}
+            onBookDoctor={(doc) => setActiveDoctorModal(doc)}
+          />
 
-        {/* Department Filter Chips Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8">
-          <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-2 border-b border-white/10">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1 shrink-0 mr-2">
-              <Filter className="w-3.5 h-3.5 text-netflix-cyan" /> Filter:
-            </span>
-            {DEPARTMENTS.map((dept) => {
-              const isSelected = selectedDepartment === dept;
-              return (
-                <button
-                  key={dept}
-                  onClick={() => setSelectedDepartment(dept)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all ${
-                    isSelected
-                      ? 'bg-netflix-cyan text-black shadow-cyan-glow'
-                      : 'bg-[#222222] text-gray-300 hover:bg-white/10 hover:text-white border border-white/10'
-                  }`}
-                >
-                  {dept}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Search Results Alert if active */}
-        {searchQuery && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-            <div className="bg-netflix-card border border-netflix-cyan/40 p-4 rounded-xl flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Search className="w-5 h-5 text-netflix-cyan" />
-                <span className="text-sm font-semibold">
-                  Showing results for "<strong className="text-white">{searchQuery}</strong>"
-                </span>
-              </div>
-              <button
-                onClick={() => setSearchQuery('')}
-                className="text-xs text-netflix-cyan hover:underline font-bold"
-              >
-                Clear Search
-              </button>
+          {/* Department Filter Chips Bar */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8">
+            <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-2 border-b border-white/10">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1 shrink-0 mr-2">
+                <Filter className="w-3.5 h-3.5 text-netflix-cyan" /> Filter:
+              </span>
+              {DEPARTMENTS.map((dept) => {
+                const isSelected = selectedDepartment === dept;
+                return (
+                  <button
+                    key={dept}
+                    onClick={() => setSelectedDepartment(dept)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all ${
+                      isSelected
+                        ? 'bg-netflix-cyan text-black shadow-cyan-glow'
+                        : 'bg-[#222222] text-gray-300 hover:bg-white/10 hover:text-white border border-white/10'
+                    }`}
+                  >
+                    {dept}
+                  </button>
+                );
+              })}
             </div>
           </div>
-        )}
 
-        {/* ROW 1: 70% HEALTH SHORTS (9:16 Vertical Reels/Posters) matching design */}
-        <PosterRow
-          title="70% HEALTH SHORTS"
-          badgeText="9:16 VERTICAL REELS"
-          items={filteredShorts}
-          aspectRatio="9/16"
-          onSelectDoctor={(doc) => setActiveDoctorModal(doc)}
-          onBookDoctor={(doc) => setActiveDoctorModal(doc)}
-        />
+          {/* Search Results Alert if active */}
+          {searchQuery && (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+              <div className="bg-netflix-card border border-netflix-cyan/40 p-4 rounded-xl flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Search className="w-5 h-5 text-netflix-cyan" />
+                  <span className="text-sm font-semibold">
+                    Showing results for "<strong className="text-white">{searchQuery}</strong>"
+                  </span>
+                </div>
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="text-xs text-netflix-cyan hover:underline font-bold"
+                >
+                  Clear Search
+                </button>
+              </div>
+            </div>
+          )}
 
-        {/* ROW 2: 30% DEEP DIVES & PODCASTS (16:9 Landscape Video Cards) matching design */}
-        <PosterRow
-          title="30% DEEP DIVES & PODCASTS"
-          badgeText="16:9 MASTERCLASSES"
-          items={filteredDeepDives}
-          aspectRatio="16/9"
-          onSelectDoctor={(doc) => setActiveDoctorModal(doc)}
-          onBookDoctor={(doc) => setActiveDoctorModal(doc)}
-        />
+          {/* ROW 1: 70% HEALTH SHORTS (9:16 Vertical Reels/Posters) matching design */}
+          <PosterRow
+            title="70% HEALTH SHORTS"
+            badgeText="9:16 VERTICAL REELS"
+            items={filteredShorts}
+            aspectRatio="9/16"
+            onSelectDoctor={(doc) => setViewingProfileDoctor(doc)}
+            onBookDoctor={(doc) => setActiveDoctorModal(doc)}
+          />
 
-        {/* ROW 3: TOP CARDIOLOGY SPECIALISTS */}
-        <PosterRow
-          title="CARDIOLOGY & HEART CARE"
-          badgeText="TOP SPECIALISTS"
-          items={HEALTH_SHORTS.filter((d) => d.specialty.includes('Cardiology') || d.specialty.includes('Ortho'))}
-          aspectRatio="9/16"
-          onSelectDoctor={(doc) => setActiveDoctorModal(doc)}
-          onBookDoctor={(doc) => setActiveDoctorModal(doc)}
-        />
+          {/* ROW 2: 30% DEEP DIVES & PODCASTS (16:9 Landscape Video Cards) matching design */}
+          <PosterRow
+            title="30% DEEP DIVES & PODCASTS"
+            badgeText="16:9 MASTERCLASSES"
+            items={filteredDeepDives}
+            aspectRatio="16/9"
+            onSelectDoctor={(doc) => setViewingProfileDoctor(doc)}
+            onBookDoctor={(doc) => setActiveDoctorModal(doc)}
+          />
 
-        {/* ROW 4: WELLNESS & DIET PODCASTS */}
-        <PosterRow
-          title="NUTRITION & METABOLIC HEALTH"
-          badgeText="16:9 EPISODES"
-          items={DEEP_DIVES.filter((d) => d.specialty.includes('Endocrinology') || d.specialty.includes('Dermatology') || d.specialty.includes('Psychiatry'))}
-          aspectRatio="16/9"
-          onSelectDoctor={(doc) => setActiveDoctorModal(doc)}
-          onBookDoctor={(doc) => setActiveDoctorModal(doc)}
-        />
+          {/* ROW 3: TOP CARDIOLOGY SPECIALISTS */}
+          <PosterRow
+            title="CARDIOLOGY & HEART CARE"
+            badgeText="TOP SPECIALISTS"
+            items={HEALTH_SHORTS.filter((d) => d.specialty.includes('Cardiology') || d.specialty.includes('Ortho'))}
+            aspectRatio="9/16"
+            onSelectDoctor={(doc) => setViewingProfileDoctor(doc)}
+            onBookDoctor={(doc) => setActiveDoctorModal(doc)}
+          />
 
-      </main>
+        </main>
+      )}
 
       {/* Footer Component */}
       <Footer />

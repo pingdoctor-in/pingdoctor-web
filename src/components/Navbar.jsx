@@ -53,7 +53,7 @@ export default function Navbar({
 
             {/* Desktop Navigation Links */}
             <nav className="hidden md:flex items-center space-x-6 text-sm font-semibold">
-              {['HOME', 'DEPARTMENTS', 'WELLNESS', 'MY HEALTH'].map((tab) => (
+              {['HOME', 'DOCTORS', 'DEPARTMENTS', 'WELLNESS', 'MY HEALTH'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
